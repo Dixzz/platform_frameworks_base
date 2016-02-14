@@ -49,4 +49,7 @@
   <java-symbol type="bool" name="config_useDarkBgNotificationIconTextTinting" />
   <java-symbol type="bool" name="config_useDarkBgNotificationTinting_override" />
   <java-symbol type="bool" name="config_notificationTinting_override" />
+
+    <!-- Hardware key binding -->
+  <java-symbol type="integer" name="config_deviceHardwareKeys" />
 </resources>
