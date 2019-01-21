@@ -4142,6 +4142,12 @@ public final class Settings {
          */
 
         /**
+         * Whether to show the battery info on the lockscreen while charging
+         * @hide
+         */
+        public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -7981,8 +7987,9 @@ public final class Settings {
          * Display style of the status bar battery information
          * 0: Display the battery an icon in portrait mode
          * 1: Display the battery as a circle
-         * 2: Display the battery as text
-         * 3: Do not display the battery
+         * 2: Display the battery as a dotted circle
+         * 3: Display the battery as text
+         * 4: Do not display the battery
          * default: 0
          * @hide
          */
@@ -7990,7 +7997,7 @@ public final class Settings {
 
         /** @hide */
         public static final Validator STATUS_BAR_BATTERY_STYLE_VALIDATOR =
-                new SettingsValidators.InclusiveIntegerRangeValidator(0, 3);
+                new SettingsValidators.InclusiveIntegerRangeValidator(0, 4);
 
         /**
          * Whether to set a lower brightness level when enabling night mode
