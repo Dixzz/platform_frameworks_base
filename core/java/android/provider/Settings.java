@@ -3939,6 +3939,13 @@ public final class Settings {
         private static final Validator POWER_SOUNDS_ENABLED_VALIDATOR = BOOLEAN_VALIDATOR;
 
         /**
+         * Whether to enable gaming mode or not
+         *
+         * @hide
+         */
+        public static final String ENABLE_GAMING_MODE = "enable_gaming_mode";
+
+        /**
          * @deprecated Use {@link android.provider.Settings.Global#DOCK_SOUNDS_ENABLED}
          * instead
          * @hide
@@ -5495,6 +5502,7 @@ public final class Settings {
          */
         public static final String INPUT_METHOD_SELECTOR_VISIBILITY =
                 "input_method_selector_visibility";
+
 
         /**
          * The currently selected voice interaction service flattened ComponentName.
