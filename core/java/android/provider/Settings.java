@@ -4173,6 +4173,15 @@ public final class Settings {
         public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
 
         /**
+         * 0 - Default
+         * 1 - Round with ring
+         * 2 - Two-toned round with ring
+         * 3 - Squircle with ring
+         * @hide
+         */
+        public static final String QS_TILE_STYLE = "qs_tile_style";
+
+        /**
          * Number of qs columns on landscape orientation
          * @hide
          */
@@ -4402,6 +4411,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(OMNI_QS_LAYOUT_ROWS);
 	    PRIVATE_SETTINGS.add(OMNI_QS_LAYOUT_ROWS_LANDSCAPE);
 	    PRIVATE_SETTINGS.add(OMNI_QS_QUICKBAR_COLUMNS);
+            PRIVATE_SETTINGS.add(QS_TILE_STYLE);
         }
 
         /**

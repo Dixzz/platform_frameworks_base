@@ -60,10 +60,12 @@ import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.content.ContentResolver;
 import android.content.om.IOverlayManager;
 import android.content.om.OverlayInfo;
 import android.content.pm.IPackageManager;
@@ -72,6 +74,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.UserInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -320,6 +323,13 @@ public class StatusBar extends SystemUI implements DemoMode,
     public static final int FADE_KEYGUARD_START_DELAY = 100;
     public static final int FADE_KEYGUARD_DURATION = 300;
     public static final int FADE_KEYGUARD_DURATION_PULSING = 96;
+
+    private static final String[] QS_TILE_THEMES = {
+        "com.android.systemui.qstile.default", // 0
+        "com.android.systemui.qstile.circletrim", // 1
+        "com.android.systemui.qstile.dualtonecircletrim", // 2
+        "com.android.systemui.qstile.squircletrim", // 3
+    };
 
     /** If true, the system is in the half-boot-to-decryption-screen state.
      * Prudently disable QS and notifications.  */
@@ -717,6 +727,9 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
 
         createAndAddWindows();
+
+        mPearlSettingsObserver.observe();
+        mPearlSettingsObserver.update();
 
         // Make sure we always have the most current wallpaper info.
         IntentFilter wallpaperChangedFilter = new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED);
@@ -3890,6 +3903,15 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
     /**
+     * Switches qs tile style.
+     */
+     public void updateTileStyle() {
+         int qsTileStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+                 Settings.System.QS_TILE_STYLE, 0, mLockscreenUserManager.getCurrentUserId());
+        updateNewTileStyle(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), qsTileStyle);
+     }
+
+    /**
      * Switches theme from light to dark and vice-versa.
      */
     protected void updateTheme() {
@@ -3942,6 +3964,11 @@ public class StatusBar extends SystemUI implements DemoMode,
             // Make sure we have the correct navbar/statusbar colors.
             mStatusBarWindowManager.setKeyguardDark(useDarkText);
         }
+    }
+
+    // Switches qs tile style back to stock.
+    public void stockTileStyle() {
+        stockNewTileStyle(mOverlayManager, mLockscreenUserManager.getCurrentUserId());
     }
 
     private void updateDozingState() {
@@ -5086,6 +5113,61 @@ public class StatusBar extends SystemUI implements DemoMode,
             mVrMode = enabled;
         }
     };
+
+    private PearlSettingsObserver mPearlSettingsObserver = new PearlSettingsObserver(mHandler);
+    private class PearlSettingsObserver extends ContentObserver {
+        PearlSettingsObserver(Handler handler) {
+            super(handler);
+        }
+         void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                     Settings.System.QS_TILE_STYLE),
+                    false, this, UserHandle.USER_ALL);
+            update();
+	 }
+
+    @Override
+        public void onChange(boolean selfChange, Uri uri) {
+        if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_STYLE))) {
+                stockTileStyle();
+                updateTileStyle();
+        }
+    }
+
+        public void update() {
+
+        }
+    }
+    // Switches qs tile style to user selected.
+    public static void updateNewTileStyle(IOverlayManager om, int userId, int qsTileStyle) {
+        if (qsTileStyle == 0) {
+            stockNewTileStyle(om, userId);
+        } else {
+            try {
+                om.setEnabled(QS_TILE_THEMES[qsTileStyle],
+                        true, userId);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Can't change qs tile style", e);
+            }
+        }
+    }
+
+    // Switches qs tile style back to stock.
+    public static void stockNewTileStyle(IOverlayManager om, int userId) {
+        // skip index 0
+        for (int i = 1; i < QS_TILE_THEMES.length; i++) {
+            String qstiletheme = QS_TILE_THEMES[i];
+            try {
+                om.setEnabled(qstiletheme,
+                        false /*disable*/, userId);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public boolean isDeviceInVrMode() {
         return mVrMode;
