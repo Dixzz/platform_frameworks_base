@@ -435,4 +435,13 @@ interface IWindowManager
      * @param displayId The id of the display.
      */
     void dontOverrideDisplayInfo(int displayId);
+
+    /**
+     * Send some ActionHandler commands to WindowManager.
+     */
+    void sendCustomAction(in Intent intent);
+
+    boolean isGestureButtonEnabled();
+
+    boolean isGestureButtonRegion(int i, int i2);
 }
