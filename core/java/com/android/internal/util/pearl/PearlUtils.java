@@ -78,11 +78,6 @@ public class PearlUtils {
         }, 20);
     }
 
-    public static void sendKeycode(int keycode) {
-        final Handler handler = new Handler(Looper.getMainLooper());
-        sendKeycode(keycode, handler);
-    }
-
     private static final class FireActions {
         private static IStatusBarService mStatusBarService = null;
         private static IStatusBarService getStatusBarService() {

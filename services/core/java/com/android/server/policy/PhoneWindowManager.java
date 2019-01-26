@@ -863,21 +863,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int MSG_REQUEST_TRANSIENT_BARS_ARG_STATUS = 0;
     private static final int MSG_REQUEST_TRANSIENT_BARS_ARG_NAVIGATION = 1;
 
-    private CameraManager mCameraManager;
-    private String mRearFlashCameraId;
-    private boolean mTorchLongPressPowerEnabled;
-    private boolean mTorchEnabled;
-    private int mTorchTimeout;
-    private PendingIntent mTorchOffPendingIntent;
-
-    private boolean mClearedBecauseOfForceShow;
-    private boolean mTopWindowIsKeyguard;
-
-    private HardkeyActionHandler mKeyHandler;
-    private boolean mUseGestureButton;
-    private GestureButton mGestureButton;
-    private boolean mGestureButtonRegistered;
-
     private class PolicyHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -1055,42 +1040,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.VOLUME_BUTTON_MUSIC_CONTROL), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.TORCH_LONG_PRESS_POWER_GESTURE), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.TORCH_LONG_PRESS_POWER_TIMEOUT), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.ANSWER_VOLUME_BUTTON_BEHAVIOR_ANSWER), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.HOME_WAKE_BUTTON), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.ACCELEROMETER_ROTATION_ANGLES), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.NAVIGATION_BAR_VISIBLE), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.NAVIGATION_BAR_HEIGHT), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.NAVIGATION_BAR_HEIGHT_LANDSCAPE), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.NAVIGATION_BAR_WIDTH), false, this,
-                    UserHandle.USER_ALL);
-	        resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.THREE_FINGER_GESTURE), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.RECENTS_LAYOUT_STYLE), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.OMNI_USE_BOTTOM_GESTURE_NAVIGATION), false, this,
                     UserHandle.USER_ALL);
             updateSettings();
         }
@@ -2624,36 +2573,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.VOLUME_BUTTON_MUSIC_CONTROL, 0,
                     UserHandle.USER_CURRENT) != 0;
 
-            mVolumeAnswer = (Settings.System.getIntForUser(resolver,
-                    Settings.System.ANSWER_VOLUME_BUTTON_BEHAVIOR_ANSWER, 0, UserHandle.USER_CURRENT) == 1);
-
-            mUseGestureButton = Settings.System.getIntForUser(resolver,
-                    Settings.System.OMNI_USE_BOTTOM_GESTURE_NAVIGATION, 0,
-                    UserHandle.USER_CURRENT) != 0;
-        }
-
-        boolean doShowNavbar = Settings.Secure.getIntForUser(resolver,
-                Settings.Secure.NAVIGATION_BAR_VISIBLE,
-                ActionUtils.hasNavbarByDefault(mContext) ? 1 : 0,
-                UserHandle.USER_CURRENT) == 1;
-        if (doShowNavbar != mNavbarVisible) {
-            mNavbarVisible = doShowNavbar;
         }
         synchronized (mWindowManagerFuncs.getWindowManagerLock()) {
             PolicyControl.reloadFromSetting(mContext);
         }
         if (updateRotation) {
             updateRotation(true);
-        }
-
-        if (mUseGestureButton && !mGestureButtonRegistered) {
-            mGestureButton = new GestureButton(mContext, this);
-            mWindowManagerFuncs.registerPointerEventListener(mGestureButton);
-            mGestureButtonRegistered = true;
-        }
-        if (mGestureButtonRegistered && !mUseGestureButton) {
-            mWindowManagerFuncs.unregisterPointerEventListener(mGestureButton);
-            mGestureButtonRegistered = false;
         }
     }
 
@@ -4465,7 +4390,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return mSearchManager;
     }
 
-    protected void preloadRecentApps() {
+    private void preloadRecentApps() {
         mPreloadedRecentApps = true;
         StatusBarManagerInternal statusbar = getStatusBarManagerInternal();
         if (statusbar != null) {
@@ -4473,7 +4398,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    protected void cancelPreloadRecentApps() {
+    private void cancelPreloadRecentApps() {
         if (mPreloadedRecentApps) {
             mPreloadedRecentApps = false;
             StatusBarManagerInternal statusbar = getStatusBarManagerInternal();
@@ -4483,7 +4408,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    protected void toggleRecentApps() {
+    private void toggleRecentApps() {
         mPreloadedRecentApps = false; // preloading no longer needs to be canceled
         StatusBarManagerInternal statusbar = getStatusBarManagerInternal();
         if (statusbar != null) {
@@ -4801,9 +4726,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mSystemGestures.screenHeight = displayFrames.mUnrestricted.height();
         mDockLayer = 0x10000000;
         mStatusBarLayer = -1;
-        final int displayHeight = displayFrames.mDisplayHeight;
-        final int displayWidth = displayFrames.mDisplayWidth;
-        final int displayRotation = displayFrames.mRotation;
+
         // start with the current dock rect, which will be (0,0,displayWidth,displayHeight)
         final Rect pf = mTmpParentFrame;
         final Rect df = mTmpDisplayFrame;
@@ -4863,10 +4786,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     displayFrames, pf, df, of, vf, dcf, sysui, isKeyguardShowing);
             if (updateSysUiVisibility) {
                 updateSystemUiVisibilityLw();
-            }
-
-            if (!mNavbarVisible && mUseGestureButton && mGestureButton != null) {
-                mGestureButton.navigationBarPosition(displayWidth, displayHeight, displayRotation);
             }
         }
         layoutScreenDecorWindows(displayFrames, pf, df, dcf);
@@ -9225,42 +9144,5 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         Message msg = mHandler.obtainMessage(MSG_DISPATCH_VOLKEY_WITH_WAKE_LOCK, event);
         msg.setAsynchronous(true);
         mHandler.sendMessageDelayed(msg, ViewConfiguration.getLongPressTimeout());
-    }
-
-    @Override
-    public void sendCustomAction(Intent intent) {
-        String action = intent.getAction();
-        if (action != null) {
-            if (ActionHandler.INTENT_SHOW_POWER_MENU.equals(action)) {
-                showGlobalActions();
-            } else if (ActionHandler.INTENT_SCREENSHOT.equals(action)) {
-                mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER, TAG + "sendCustomAction permission denied");
-                mHandler.removeCallbacks(mScreenshotRunnable);
-                mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_FULLSCREEN);
-                mHandler.post(mScreenshotRunnable);
-            } else if (ActionHandler.INTENT_REGION_SCREENSHOT.equals(action)) {
-                mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER, TAG + "sendCustomAction permission denied");
-                mHandler.removeCallbacks(mScreenshotRunnable);
-                mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_SELECTED_REGION);
-                mHandler.post(mScreenshotRunnable);
-            }/* else if (ActionHandler.INTENT_TOGGLE_SCREENRECORD.equals(action)) {
-                mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER, TAG + "sendCustomAction permission denied");
-                mHandler.removeCallbacks(mScreenrecordRunnable);
-                mHandler.post(mScreenrecordRunnable);
-            }*/
-        }
-    }
-
-    @Override
-    public boolean isGestureButtonRegion(int x, int y) {
-        if (!mUseGestureButton || mGestureButton == null) {
-            return false;
-        }
-        return mGestureButton.isGestureButtonRegion(x, y);
-    }
-
-    @Override
-    public boolean isGestureButtonEnabled() {
-        return mUseGestureButton;
     }
 }

@@ -17,10 +17,7 @@
 package com.android.systemui.qs;
 
 import android.content.Context;
-import android.content.ContentResolver;
 import android.content.res.Configuration;
-import android.os.UserHandle;
-import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -45,7 +42,7 @@ import java.util.Collection;
  */
 public class QuickQSPanel extends QSPanel {
 
-    public static final int NUM_QUICK_TILES_DEFAULT = 6;
+    public static final String NUM_QUICK_TILES = "sysui_qqs_count";
 
     private boolean mDisabledByPolicy;
     private int mMaxTiles;
@@ -62,11 +59,10 @@ public class QuickQSPanel extends QSPanel {
             }
             removeView((View) mTileLayout);
         }
-        mTileLayout = new HeaderTileLayout(context, this);
+        mTileLayout = new HeaderTileLayout(context);
         mTileLayout.setListening(mListening);
         addView((View) mTileLayout, 0 /* Between brightness and footer */);
         super.setPadding(0, 0, 0, 0);
-        updateSettings();
     }
 
     @Override
@@ -81,11 +77,13 @@ public class QuickQSPanel extends QSPanel {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        Dependency.get(TunerService.class).addTunable(mNumTiles, NUM_QUICK_TILES);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        Dependency.get(TunerService.class).removeTunable(mNumTiles);
     }
 
     public void setQSPanelAndHeader(QSPanel fullPanel, View header) {
@@ -116,7 +114,7 @@ public class QuickQSPanel extends QSPanel {
         setTiles(mHost.getTiles());
     }
 
-    private void setMaxTiles(int maxTiles) {
+    public void setMaxTiles(int maxTiles) {
         mMaxTiles = maxTiles;
         if (mHost != null) {
             setTiles(mHost.getTiles());
@@ -143,8 +141,15 @@ public class QuickQSPanel extends QSPanel {
         super.setTiles(quickTiles, true);
     }
 
-    public int getNumQuickTiles() {
-        return mMaxTiles;
+    private final Tunable mNumTiles = new Tunable() {
+        @Override
+        public void onTuningChanged(String key, String newValue) {
+            setMaxTiles(getNumQuickTiles(mContext));
+        }
+    };
+
+    public static int getNumQuickTiles(Context context) {
+        return Dependency.get(TunerService.class).getValue(NUM_QUICK_TILES, 6);
     }
 
     void setDisabledByPolicy(boolean disabled) {
@@ -171,24 +176,15 @@ public class QuickQSPanel extends QSPanel {
         super.setVisibility(visibility);
     }
 
-    public void updateSettings() {
-        int qsColumns = Settings.System.getIntForUser(
-                mContext.getContentResolver(), Settings.System.OMNI_QS_QUICKBAR_COLUMNS,
-                NUM_QUICK_TILES_DEFAULT, UserHandle.USER_CURRENT);
-        setMaxTiles(qsColumns);
-    }
-
     private static class HeaderTileLayout extends LinearLayout implements QSTileLayout {
 
         protected final ArrayList<TileRecord> mRecords = new ArrayList<>();
         private boolean mListening;
         /** Size of the QS tile (width & height). */
         private int mTileDimensionSize;
-        private QuickQSPanel mPanel;
 
-        public HeaderTileLayout(Context context, QuickQSPanel panel) {
+        public HeaderTileLayout(Context context) {
             super(context);
-            mPanel = panel;
             setClipChildren(false);
             setClipToPadding(false);
 
@@ -319,13 +315,5 @@ public class QuickQSPanel extends QSPanel {
                         R.id.expand_indicator);
             }
         }
-        @Override
-        public void updateSettings() {
-        }
-
-        public int getNumColumns() {
-            return mPanel.getNumQuickTiles();
-        }
-
     }
 }
