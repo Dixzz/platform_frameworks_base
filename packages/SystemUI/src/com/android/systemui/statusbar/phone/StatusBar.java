@@ -65,6 +65,7 @@ import com.android.systemui.statusbar.notification.AboveShelfObserver;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -333,10 +334,10 @@ public class StatusBar extends SystemUI implements DemoMode,
     private static final boolean ENABLE_LOCKSCREEN_WALLPAPER = true;
 
     /** Whether to force dark theme if Configuration.UI_MODE_NIGHT_YES. */
-    private static final boolean DARK_THEME_IN_NIGHT_MODE = true;
+    private static final boolean DARK_THEME_IN_NIGHT_MODE = false;
 
     /** Whether to switch the device into night mode in battery saver. */
-    private static final boolean NIGHT_MODE_IN_BATTERY_SAVER = true;
+    private static final boolean NIGHT_MODE_IN_BATTERY_SAVER = false;
 
     /**
      * Never let the alpha become zero for surfaces that draw with SRC - otherwise the RenderNode
@@ -723,6 +724,9 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
 
         createAndAddWindows();
+
+        mSbSettingsObserver.observe();
+        mSbSettingsObserver.update();
 
         // Make sure we always have the most current wallpaper info.
         IntentFilter wallpaperChangedFilter = new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED);
@@ -3196,6 +3200,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         updateNotificationViews();
         mMediaManager.clearCurrentMediaNotification();
         setLockscreenUser(newUserId);
+        mSbSettingsObserver.update();
     }
 
     @Override
@@ -5131,6 +5136,10 @@ public class StatusBar extends SystemUI implements DemoMode,
                 updateTheme();
             }
         }
+
+        public void update() {
+        }
+    }
 
     private void updateDarkThemeSetting() {
         mDarkThemeStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
