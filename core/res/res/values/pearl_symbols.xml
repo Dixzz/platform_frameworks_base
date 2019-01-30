@@ -49,4 +49,25 @@
   <java-symbol type="bool" name="config_useDarkBgNotificationIconTextTinting" />
   <java-symbol type="bool" name="config_useDarkBgNotificationTinting_override" />
   <java-symbol type="bool" name="config_notificationTinting_override" />
+  <java-symbol type="string" name="fontservice_incompatible_font" />
+
+  <!-- Weather -->
+  <java-symbol type="drawable" name="weather_clear_night" />
+  <java-symbol type="drawable" name="weather_cloudy" />
+  <java-symbol type="drawable" name="weather_foggy" />
+  <java-symbol type="drawable" name="weather_isolated_scattered_thunderstorms_night" />
+  <java-symbol type="drawable" name="weather_isolated_scattered_thunderstorms" />
+  <java-symbol type="drawable" name="weather_mostly_clear_night" />
+  <java-symbol type="drawable" name="weather_mostly_cloudy_night" />
+  <java-symbol type="drawable" name="weather_mostly_cloudy" />
+  <java-symbol type="drawable" name="weather_mostly_sunny" />
+  <java-symbol type="drawable" name="weather_partly_cloudy_night" />
+  <java-symbol type="drawable" name="weather_partly_cloudy" />
+  <java-symbol type="drawable" name="weather_rain" />
+  <java-symbol type="drawable" name="weather_scattered_showers_night" />
+  <java-symbol type="drawable" name="weather_scattered_showers" />
+  <java-symbol type="drawable" name="weather_snow" />
+  <java-symbol type="drawable" name="weather_sunny" />
+  <java-symbol type="drawable" name="weather_thunderstorms" />
+  <java-symbol type="drawable" name="weather_windy" />
 </resources>
