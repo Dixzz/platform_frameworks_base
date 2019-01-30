@@ -13413,6 +13413,7 @@ public final class Settings {
      * @return The device ID that should be used when connecting to the mobile gtalk server.
      * @hide
      */
+
     public static String getGTalkDeviceId(long androidId) {
         return "android-" + Long.toHexString(androidId);
     }
