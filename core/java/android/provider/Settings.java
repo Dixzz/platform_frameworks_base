@@ -4411,7 +4411,7 @@ public final class Settings {
             STATUSBAR_CLOCK_AM_PM_STYLE,
             STATUSBAR_CLOCK_DATE_DISPLAY,
             STATUSBAR_CLOCK_DATE_STYLE,
-            STATUSBAR_CLOCK_DATE_FORMAT
+            STATUSBAR_CLOCK_DATE_FORMAT,
             WEATHER_LOCKSCREEN_UNIT,
         };
 
@@ -13474,6 +13474,7 @@ public final class Settings {
      * @return The device ID that should be used when connecting to the mobile gtalk server.
      * @hide
      */
+
     public static String getGTalkDeviceId(long androidId) {
         return "android-" + Long.toHexString(androidId);
     }
