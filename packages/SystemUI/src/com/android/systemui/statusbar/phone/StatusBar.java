@@ -59,6 +59,10 @@ import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
+import android.database.ContentObserver;
+import android.view.ViewTreeObserver;
+import com.android.systemui.statusbar.notification.AboveShelfObserver;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -416,6 +420,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     private int mMaxAllowedKeyguardNotifications;
 
     private boolean mExpandedVisible;
+    // false is for dark theme, true for black
+    private boolean mDarkThemeStyle;
 
     private final int[] mAbsPos = new int[2];
     private final ArrayList<Runnable> mPostCollapseRunnables = new ArrayList<>();
@@ -802,6 +808,7 @@ public class StatusBar extends SystemUI implements DemoMode,
     protected void makeStatusBarView() {
         final Context context = mContext;
         updateDisplaySize(); // populates mDisplayMetrics
+        updateDarkThemeSetting();
         updateResources();
         updateTheme();
 
@@ -2096,8 +2103,13 @@ public class StatusBar extends SystemUI implements DemoMode,
     public boolean isUsingDarkTheme() {
         OverlayInfo themeInfo = null;
         try {
-            themeInfo = mOverlayManager.getOverlayInfo("com.android.systemui.theme.dark",
-                    mLockscreenUserManager.getCurrentUserId());
+            if (mDarkThemeStyle) {
+                themeInfo = mOverlayManager.getOverlayInfo("com.android.system.theme.black",
+                        mLockscreenUserManager.getCurrentUserId());
+            } else {
+                themeInfo = mOverlayManager.getOverlayInfo("com.android.system.theme.dark",
+                        mLockscreenUserManager.getCurrentUserId());
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -3905,11 +3917,18 @@ public class StatusBar extends SystemUI implements DemoMode,
                 && (config.uiMode & Configuration.UI_MODE_NIGHT_MASK)
                     == Configuration.UI_MODE_NIGHT_YES;
         final boolean useDarkTheme = nightModeWantsDarkTheme;
-        if (isUsingDarkTheme() != useDarkTheme) {
+        final boolean usingDarkTheme = isUsingDarkTheme();
+        if ((usingDarkTheme != useDarkTheme) || (usingDarkTheme != mDarkThemeStyle)) {
+            final boolean useBlackStyle = useDarkTheme && mDarkThemeStyle;
+            final boolean useDarkStyle = useDarkTheme && !mDarkThemeStyle;
             mUiOffloadThread.submit(() -> {
                 try {
-                    mOverlayManager.setEnabled("com.android.systemui.theme.dark",
-                            useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.system.theme.black",
+		            useBlackStyle, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.settings.theme.black",
+                            useBlackStyle, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.system.theme.dark",
+                            useDarkStyle, mLockscreenUserManager.getCurrentUserId());
                 } catch (RemoteException e) {
                     Log.w(TAG, "Can't change theme", e);
                 }
@@ -5089,6 +5108,34 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     public boolean isDeviceInVrMode() {
         return mVrMode;
+    }
+
+    private SbSettingsObserver mSbSettingsObserver = new SbSettingsObserver(mHandler);
+    private class SbSettingsObserver extends ContentObserver {
+        SbSettingsObserver(Handler handler) {
+            super(handler);
+        }
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.DARK_THEME_STYLE),
+                    false, this, UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.DARK_THEME_STYLE))) {
+                updateDarkThemeSetting();
+                updateTheme();
+            }
+        }
+
+    private void updateDarkThemeSetting() {
+        mDarkThemeStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.DARK_THEME_STYLE, 0,
+                UserHandle.USER_CURRENT) != 0;
     }
 
     private final BroadcastReceiver mBannerActionBroadcastReceiver = new BroadcastReceiver() {

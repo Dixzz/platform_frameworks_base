@@ -3964,6 +3964,13 @@ public final class Settings {
         public static final String ENABLE_GAMING_MODE = "enable_gaming_mode";
 
         /**
+         * Select between dark or black theme
+         *
+         * @hide
+         */
+        public static final String DARK_THEME_STYLE = "dark_theme_style";
+
+        /**
          * @deprecated Use {@link android.provider.Settings.Global#DOCK_SOUNDS_ENABLED}
          * instead
          * @hide
