@@ -334,10 +334,10 @@ public class StatusBar extends SystemUI implements DemoMode,
     private static final boolean ENABLE_LOCKSCREEN_WALLPAPER = true;
 
     /** Whether to force dark theme if Configuration.UI_MODE_NIGHT_YES. */
-    private static final boolean DARK_THEME_IN_NIGHT_MODE = false;
+    private static final boolean DARK_THEME_IN_NIGHT_MODE = true;
 
     /** Whether to switch the device into night mode in battery saver. */
-    private static final boolean NIGHT_MODE_IN_BATTERY_SAVER = false;
+    private static final boolean NIGHT_MODE_IN_BATTERY_SAVER = true;
 
     /**
      * Never let the alpha become zero for surfaces that draw with SRC - otherwise the RenderNode
@@ -812,8 +812,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     protected void makeStatusBarView() {
         final Context context = mContext;
         updateDisplaySize(); // populates mDisplayMetrics
-        updateDarkThemeSetting();
         updateResources();
+        updateDarkThemeSetting();
         updateTheme();
 
         inflateStatusBarWindow(context);
@@ -3915,13 +3915,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         // The system wallpaper defines if QS should be light or dark.
         WallpaperColors systemColors = mColorExtractor
                 .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-        final boolean wallpaperWantsDarkTheme = systemColors != null
+        final boolean useDarkTheme = systemColors != null
                 && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
-        final Configuration config = mContext.getResources().getConfiguration();
-        final boolean nightModeWantsDarkTheme = DARK_THEME_IN_NIGHT_MODE
-                && (config.uiMode & Configuration.UI_MODE_NIGHT_MASK)
-                    == Configuration.UI_MODE_NIGHT_YES;
-        final boolean useDarkTheme = nightModeWantsDarkTheme;
         final boolean usingDarkTheme = isUsingDarkTheme();
         if ((usingDarkTheme != useDarkTheme) || (usingDarkTheme != mDarkThemeStyle)) {
             final boolean useBlackStyle = useDarkTheme && mDarkThemeStyle;
@@ -3933,6 +3928,8 @@ public class StatusBar extends SystemUI implements DemoMode,
                     mOverlayManager.setEnabled("com.android.settings.theme.black",
                             useBlackStyle, mLockscreenUserManager.getCurrentUserId());
                     mOverlayManager.setEnabled("com.android.system.theme.dark",
+                            useDarkStyle, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.settings.theme.dark",
                             useDarkStyle, mLockscreenUserManager.getCurrentUserId());
                 } catch (RemoteException e) {
                     Log.w(TAG, "Can't change theme", e);
@@ -5125,12 +5122,14 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.DARK_THEME_STYLE),
                     false, this, UserHandle.USER_ALL);
+            update();
         }
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             super.onChange(selfChange, uri);
-            if (uri.equals(Settings.System.getUriFor(
+            update();
+        if (uri.equals(Settings.System.getUriFor(
                     Settings.System.DARK_THEME_STYLE))) {
                 updateDarkThemeSetting();
                 updateTheme();
@@ -5138,6 +5137,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
 
         public void update() {
+            updateTheme();
         }
     }
 
