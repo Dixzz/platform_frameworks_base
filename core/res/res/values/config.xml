@@ -2578,6 +2578,7 @@
     <integer name="config_maxNumVisibleRecentTasks_grid">9</integer>
 
     <!-- The minimum number of visible recent tasks to be presented to the user through the
+
          SystemUI. Can be -1 if there is no minimum limit. -->
     <integer name="config_minNumVisibleRecentTasks_lowRam">-1</integer>
 
@@ -2619,6 +2620,7 @@
     <string-array translatable="false" name="config_globalActionsList">
         <item>power</item>
         <item>restart</item>
+        <item>recovery</item>
         <item>lockdown</item>
         <item>logout</item>
         <item>bugreport</item>
