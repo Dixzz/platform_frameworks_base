@@ -49,7 +49,6 @@
   <java-symbol type="bool" name="config_useDarkBgNotificationIconTextTinting" />
   <java-symbol type="bool" name="config_useDarkBgNotificationTinting_override" />
   <java-symbol type="bool" name="config_notificationTinting_override" />
-  <java-symbol type="string" name="fontservice_incompatible_font" />
 
   <!-- Weather -->
   <java-symbol type="drawable" name="weather_clear_night" />
