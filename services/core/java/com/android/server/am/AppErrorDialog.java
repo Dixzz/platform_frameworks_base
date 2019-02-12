@@ -46,6 +46,7 @@ final class AppErrorDialog extends BaseErrorDialog implements View.OnClickListen
     private final AppErrorResult mResult;
     private final ProcessRecord mProc;
     private final boolean mIsRestartable;
+    private String mPaste;
 
     static int CANT_SHOW = -1;
     static int BACKGROUND_USER = -2;
