@@ -5936,21 +5936,22 @@ public class ActivityManagerService extends IActivityManager.Stub
         } finally {
             mWindowManager.continueSurfaceLayout();
         }
+    }
 
         // Hack for pi
         // When an app process is removed, activities from the process may be relaunched. In the
         // case of forceStopPackageLocked the activities are finished before any window is drawn,
         // and the launch time is not cleared. This will be incorrectly used to calculate launch
         // time for the next launched activity launched in the same windowing mode.
-        if (clearLaunchStartTime) {
-            final LaunchTimeTracker.Entry entry = mStackSupervisor
+/*        if (clearLaunchStartTime) {
+/            final LaunchTimeTracker.Entry entry = mStackSupervisor
                     .getLaunchTimeTracker().getEntry(mStackSupervisor.getWindowingMode());
             if (entry != null) {
                 entry.mLaunchStartTime = 0;
             }
         }
     }
-
+*/
     private final int getLRURecordIndexForAppLocked(IApplicationThread thread) {
         final IBinder threadBinder = thread.asBinder();
         // Find the application record.
