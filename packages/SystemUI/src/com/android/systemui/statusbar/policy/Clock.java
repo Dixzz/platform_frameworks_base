@@ -70,7 +70,6 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
 
     private boolean mClockVisibleByPolicy = true;
     private boolean mClockVisibleByUser = true;
-    private boolean mClockHideableByUser = true;
 
     protected boolean mAttached;
     protected Calendar mCalendar;
@@ -277,10 +276,8 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
     };
 
     public void setClockVisibleByUser(boolean visible) {
-        if (mClockHideableByUser) {
-            mClockVisibleByUser = visible;
-            updateClockVisibility();
-        }
+        mClockVisibleByUser = visible;
+        updateClockVisibility();
     }
 
     public void setClockVisibilityByPolicy(boolean visible) {
@@ -294,14 +291,6 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
         Dependency.get(IconLogger.class).onIconVisibility("clock", visible);
         int visibility = visible ? View.VISIBLE : View.GONE;
         setVisibility(visibility);
-    }
-
-    public boolean isClockVisible() {
-        return mClockVisibleByPolicy && mClockVisibleByUser;
-    }
-
-    public void setClockHideableByUser(boolean value) {
-        mClockHideableByUser = value;
     }
 
     final void updateClock() {
