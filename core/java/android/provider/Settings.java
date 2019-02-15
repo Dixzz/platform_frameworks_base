@@ -1,4 +1,3 @@
-x
  /*
  * Copyright (C) 2006 The Android Open Source Project
  *
@@ -3992,6 +3991,15 @@ public final class Settings {
         /** @hide */
         public static final Validator LOCKSCREEN_DISABLED_VALIDATOR = BOOLEAN_VALIDATOR;
 
+        /**
+         * 0 - Default
+         * 1 - Round with ring
+         * 2 - Two-toned round with ring
+	 * 3 - Squircle with ring
+         * @hide
+         */
+        public static final String QS_TILE_STYLE = "qs_tile_style";
+
 	/**
          * Whether to show the notification ticker on the status bar
          * @hide
@@ -4529,7 +4537,8 @@ public final class Settings {
             PRIVATE_SETTINGS.add(STATUS_BAR_SHOW_TICKER);
             PRIVATE_SETTINGS.add(STATUS_BAR_TICKER_ANIMATION_MODE);
             PRIVATE_SETTINGS.add(STATUS_BAR_TICKER_TICK_DURATION);
-        }
+             PRIVATE_SETTINGS.add(QS_TILE_STYLE);
+       }
 
         /**
          * These are all public system settings
