@@ -828,7 +828,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         Dependency.get(ActivityStarterDelegate.class).setActivityStarterImpl(this);
 
         Dependency.get(ConfigurationController.class).addCallback(this);
-    }
+        mNosSettingsObserver.observe();
+        }
 
     // ================================================================================
     // Constructing the view
