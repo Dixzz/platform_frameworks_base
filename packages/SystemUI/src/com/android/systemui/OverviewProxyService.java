@@ -31,6 +31,7 @@ import android.os.PatternMatcher;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.util.Log;
+import android.provider.Settings;
 import android.view.SurfaceControl;
 
 import com.android.systemui.OverviewProxyService.OverviewProxyListener;
@@ -259,7 +260,7 @@ public class OverviewProxyService implements CallbackController<OverviewProxyLis
         mHandler = new Handler();
         mConnectionBackoffAttempts = 0;
         mRecentsComponentName = ComponentName.unflattenFromString(context.getString(
-                com.android.internal.R.string.config_recentsComponentName));
+                isPieRecentsEnabled() ? com.android.internal.R.string.config_recentsComponentName : com.android.internal.R.string.config_recentsComponentNameOreo));
         mQuickStepIntent = new Intent(ACTION_QUICKSTEP)
                 .setPackage(mRecentsComponentName.getPackageName());
         mInteractionFlags = Prefs.getInt(mContext, Prefs.Key.QUICK_STEP_INTERACTION_FLAGS, 0);
@@ -276,6 +277,11 @@ public class OverviewProxyService implements CallbackController<OverviewProxyLis
             filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
             mContext.registerReceiver(mLauncherStateChangedReceiver, filter);
         }
+    }
+
+    private boolean isPieRecentsEnabled() {
+       return Settings.System.getInt(mContext.getContentResolver(),
+                      Settings.System.RECENTS_COMPONENT, 0) == 0;
     }
 
     public void startConnectionToCurrentUser() {
