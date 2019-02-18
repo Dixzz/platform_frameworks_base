@@ -99,6 +99,7 @@ public class RecentsConfiguration {
         smallestWidth = ssp.getDeviceSmallestWidth();
         isLargeScreen = smallestWidth >= (int) (screenDensity * LARGE_SCREEN_MIN_DP);
         isXLargeScreen = smallestWidth >= (int) (screenDensity * XLARGE_SCREEN_MIN_DP);
+
     }
 
     /**

@@ -34,6 +34,8 @@ import com.android.systemui.qs.tiles.DataSaverTile;
 import com.android.systemui.qs.tiles.DndTile;
 import com.android.systemui.qs.tiles.FlashlightTile;
 import com.android.systemui.qs.tiles.GamingModeTile;
+import com.android.systemui.qs.tiles.ScreenshotTile;
+import com.android.systemui.qs.tiles.ScreenrecordTile;
 
 import com.android.systemui.qs.tiles.HotspotTile;
 import com.android.systemui.qs.tiles.IntentTile;
@@ -105,7 +107,11 @@ public class QSFactoryImpl implements QSFactory {
                 return new CompassTile(mHost);
             case "gaming":
                 return new GamingModeTile(mHost);
-        }
+            case "scr":
+                return new ScreenrecordTile(mHost);
+            case "screenshot":
+                return new ScreenshotTile(mHost);
+       }
 
         // Intent tiles.
         if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(mHost, tileSpec);
