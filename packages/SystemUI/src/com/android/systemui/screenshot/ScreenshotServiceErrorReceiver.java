@@ -36,6 +36,5 @@ public class ScreenshotServiceErrorReceiver extends BroadcastReceiver {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         GlobalScreenshot.notifyScreenshotError(context, nm,
                 R.string.screenshot_abort_text);
-                R.string.screenshot_failed_to_save_unknown_text);
     }
 }
