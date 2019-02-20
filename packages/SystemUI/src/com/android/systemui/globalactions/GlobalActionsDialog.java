@@ -505,28 +505,23 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                     mHasLogoutButton = true;
                 }
             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_AIRPLANE, 0) == 1) {
                     mItems.add(mAirplaneModeOn);
-                }
             } else if (GLOBAL_ACTION_KEY_BUGREPORT.equals(actionKey)) {
                 //if (Settings.Global.getIntForUser(mContext.getContentResolver(),
                 //        Settings.Global.BUGREPORT_IN_POWER_MENU, 0) != 0 && isCurrentUserOwner()) {
                 //    mItems.add(new BugReportAction());
                 //}
             } else if (GLOBAL_ACTION_KEY_SILENT.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_SOUNDPANEL, 0) == 1) {
+                if (mShowSilentToggle) {
+                    mItems.add(mSilentModeAction);
+                }
             } else if (GLOBAL_ACTION_KEY_USERS.equals(actionKey)) {
                 if (Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.POWERMENU_USERS, 0) == 1) {
                     addUsersToMenu(mItems);
                 }
             } else if (GLOBAL_ACTION_KEY_SETTINGS.equals(actionKey)) {
-                if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.POWERMENU_SETTINGS, 0) != 0) {
                     mItems.add(getSettingsAction());
-                }
             } else if (GLOBAL_ACTION_KEY_LOCKDOWN.equals(actionKey)) {
                 if (Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.POWERMENU_LOCKDOWN, 0) != 0) {
