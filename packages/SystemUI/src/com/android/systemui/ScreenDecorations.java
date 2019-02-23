@@ -40,6 +40,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.hardware.display.DisplayManager;
 import android.os.Handler;
+import android.os.Build;
 import android.os.HandlerThread;
 import android.os.SystemProperties;
 import android.provider.Settings.Secure;
@@ -368,10 +369,10 @@ public class ScreenDecorations extends SystemUI implements Tunable {
         // screen decorations overlay.
         int padding = mContext.getResources().getDimensionPixelSize(
                 R.dimen.rounded_corner_content_padding);
+
         if (padding != 0) {
             setupStatusBarPadding(padding);
         }
-
     }
 
     private void setupStatusBarPadding(int padding) {
