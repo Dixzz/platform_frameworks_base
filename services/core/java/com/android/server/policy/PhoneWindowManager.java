@@ -153,7 +153,8 @@ import static com.android.server.wm.WindowManagerPolicyProto.TOP_FULLSCREEN_OPAQ
 import static com.android.server.wm.WindowManagerPolicyProto.TOP_FULLSCREEN_OPAQUE_WINDOW;
 import static com.android.server.wm.WindowManagerPolicyProto.WINDOW_MANAGER_DRAW_COMPLETE;
 
-import android.annotation.Nullable;
+
+import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ActivityManagerInternal;
 import android.app.ActivityManagerInternal.SleepToken;
@@ -277,6 +278,7 @@ import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.util.ArrayUtils;
 import com.android.internal.util.ScreenshotHelper;
 import com.android.internal.util.ScreenShapeHelper;
+import com.android.internal.util.pearl.PearlUtils;
 import com.android.internal.widget.PointerLocationView;
 import com.android.server.GestureLauncherService;
 import com.android.server.LocalServices;
@@ -8555,7 +8557,27 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     @Override
-    public void setLastInputMethodWindowLw(WindowState ime, WindowState target) {
+    public void sendCustomAction(Intent intent) {
+        String action = intent.getAction();
+        if (action != null) {
+            if (PearlUtils.INTENT_SCREENSHOT.equals(action)) {
+                mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER,
+                        TAG + "sendCustomAction permission denied");
+                mHandler.removeCallbacks(mScreenshotRunnable);
+                mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_FULLSCREEN);
+                mHandler.post(mScreenshotRunnable);
+            } else if (PearlUtils.INTENT_REGION_SCREENSHOT.equals(action)) {
+                mContext.enforceCallingOrSelfPermission(Manifest.permission.ACCESS_SURFACE_FLINGER,
+                        TAG + "sendCustomAction permission denied");
+                mHandler.removeCallbacks(mScreenshotRunnable);
+                mScreenshotRunnable.setScreenshotType(TAKE_SCREENSHOT_SELECTED_REGION);
+                mHandler.post(mScreenshotRunnable);
+            }
+        }
+    }
+
+    @Override
+	    public void setLastInputMethodWindowLw(WindowState ime, WindowState target) {
         mLastInputMethodWindow = ime;
         mLastInputMethodTargetWindow = target;
     }
